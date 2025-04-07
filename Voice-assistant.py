@@ -1,3 +1,143 @@
+import speech_recognition as sr
+import datetime
+import wikipedia
+import webbrowser
+import os
+import asyncio
+import edge_tts # type: ignore
+import uuid
+from playsound import playsound # type: ignore
+
+# Speak function using male voice (no popup)
+async def speak_async(text):
+    try:
+        filename = f"voice_{uuid.uuid4().hex}.mp3"
+        voice = "en-US-GuyNeural"  # Male voice
+        tts = edge_tts.Communicate(text=text, voice=voice)
+        await tts.save(filename)
+        playsound(filename)
+        os.remove(filename)
+    except Exception as e:
+        print(f"Error in speak: {e}")
+
+def speak(text):
+    asyncio.run(speak_async(text))
+
+def wishMe():
+    hour = int(datetime.datetime.now().hour)
+    if 0 <= hour < 12:
+        speak("Hello. Good morning, sir!")
+
+    elif 12 <= hour < 18:
+        speak("Hello. Good Afternoon, Sir!")
+    else:
+        speak("Hello. Good Evening, Sir!")
+    speak("I am your assistant, Jarvess. Please tell me how may I help you")
+
+def takeCommand():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening:")
+        r.pause_threshold = 0.5
+        audio = r.listen(source)
+
+    try:
+        print("Recognizing...")
+        query = r.recognize_google(audio, language='en-in')
+        print(f"You said: {query}")
+    except sr.UnknownValueError:
+        print("Could not understand audio")
+        return "None"
+    except sr.RequestError as e:
+        print(f"Could not request results; {e}")
+        return "None"
+    return query
+
+if __name__ == "__main__":
+    wishMe()
+    while True:
+        query = takeCommand().lower()
+
+        if query == "none":
+            continue
+
+        if 'wikipedia' in query:
+            speak('Searching Wikipedia...')
+            query = query.replace("wikipedia", "")
+            try:
+                results = wikipedia.summary(query, sentences=2)
+                speak("According to Wikipedia")
+                speak(results)
+            except Exception:
+                speak("Sorry, I couldn't find any results.")
+
+        elif 'open youtube' in query:
+            speak("Opening YouTube...")
+            webbrowser.open("https://www.youtube.com")
+
+        elif 'time kya hai' in query or 'what is the time' in query:
+            strTime = datetime.datetime.now().strftime("%H:%M:%S")
+            speak(f"Sir, the time is {strTime}")
+
+        elif 'open code' in query:
+            codePath = "C:\\Users\\hp\\Microsoft VS Code\\Code.exe"
+            if os.path.exists(codePath):
+                os.startfile(codePath)
+            else:
+                speak("VS Code not found at the specified path.")
+
+        elif 'open whatsapp' in query:
+            speak("Opening WhatsApp...")
+            webbrowser.open("https://web.whatsapp.com")
+
+        elif 'open chrome' in query:
+            chromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+            if os.path.exists(chromePath):
+                os.startfile(chromePath)
+            else:
+                speak("Chrome not found at the specified path.")
+
+        elif 'exit' in query or 'quit' in query:
+            speak("Goodbye Sir!")
+            break
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # import pyttsx3
 # import speech_recognition as sr
 # import datetime
@@ -128,112 +268,112 @@
 
 
 
-import pyttsx3
-import speech_recognition as sr
-import datetime
-import wikipedia
-import webbrowser
-import os
+# import pyttsx3
+# import speech_recognition as sr
+# import datetime
+# import wikipedia
+# import webbrowser
+# import os
 
-# Initialize the text-to-speech engine
-engine = pyttsx3.init('sapi5')
-voices = engine.getProperty('voices')
+# # Initialize the text-to-speech engine
+# engine = pyttsx3.init('sapi5')
+# voices = engine.getProperty('voices')
 
-# Set the voice (0 for male, 1 for female, etc.)
-engine.setProperty('voice', voices[0].id)
+# # Set the voice (0 for male, 1 for female, etc.)
+# engine.setProperty('voice', voices[0].id)
 
-# Speak function
-def speak(audio):
-    engine.say(audio)
-    engine.runAndWait()
+# # Speak function
+# def speak(audio):
+#     engine.say(audio)
+#     engine.runAndWait()
 
-# Function to greet the user based on the time
-def wishMe():
-    hour = int(datetime.datetime.now().hour)
-    if hour >= 0 and hour < 12:
-        speak("Hello, Good Morning Sir!")
-    elif hour >= 12 and hour < 18:
-        speak("Hello, Good Afternoon Sir!")
-    else:
-        speak("Hello, Good Night Sir!")
-    speak("I am your assistant, Jarvess. Please tell me how may I help you.")
+# # Function to greet the user based on the time
+# def wishMe():
+#     hour = int(datetime.datetime.now().hour)
+#     if hour >= 0 and hour < 12:
+#         speak("Hello, Good Morning Sir!")
+#     elif hour >= 12 and hour < 18:
+#         speak("Hello, Good Afternoon Sir!")
+#     else:
+#         speak("Hello, Good Night Sir!")
+#     speak("I am your assistant, Jarvess. Please tell me how may I help you.")
 
-# Function to listen to the user's voice and convert it into text
-def takeCommand():
-    r = sr.Recognizer()
-    with sr.Microphone() as source:
-        print("Listening...")
-        r.pause_threshold = 1
-        audio = r.listen(source)
+# # Function to listen to the user's voice and convert it into text
+# def takeCommand():
+#     r = sr.Recognizer()
+#     with sr.Microphone() as source:
+#         print("Listening...")
+#         r.pause_threshold = 1
+#         audio = r.listen(source)
 
-    try:
-        print("Recognizing...")
-        query = r.recognize_google(audio, language='en-in')
-        print(f"You said: {query}\n")
-    except sr.UnknownValueError:
-        print("Could not understand audio")
-        return "None"
-    except sr.RequestError as e:
-        print(f"Could not request results; {e}")
-        return "None"
-    return query.lower()
+#     try:
+#         print("Recognizing...")
+#         query = r.recognize_google(audio, language='en-in')
+#         print(f"You said: {query}\n")
+#     except sr.UnknownValueError:
+#         print("Could not understand audio")
+#         return "None"
+#     except sr.RequestError as e:
+#         print(f"Could not request results; {e}")
+#         return "None"
+#     return query.lower()
 
-# Main function
-if __name__ == "__main__":
-    wishMe()
-    while True:
-        query = takeCommand()
+# # Main function
+# if __name__ == "__main__":
+#     wishMe()
+#     while True:
+#         query = takeCommand()
 
-        if query == "none":
-            continue
+#         if query == "none":
+#             continue
 
-        # Wikipedia search
-        if 'wikipedia' in query:
-            speak('Searching Wikipedia...')
-            query = query.replace("wikipedia", "")
-            try:
-                results = wikipedia.summary(query, sentences=2)
-                speak("According to Wikipedia")
-                speak(results)
-            except wikipedia.exceptions.DisambiguationError as e:
-                speak(f"There are multiple results for {query}. Please be more specific.")
-            except wikipedia.exceptions.PageError:
-                speak(f"Sorry, I could not find any result for {query}.")
+#         # Wikipedia search
+#         if 'wikipedia' in query:
+#             speak('Searching Wikipedia...')
+#             query = query.replace("wikipedia", "")
+#             try:
+#                 results = wikipedia.summary(query, sentences=2)
+#                 speak("According to Wikipedia")
+#                 speak(results)
+#             except wikipedia.exceptions.DisambiguationError as e:
+#                 speak(f"There are multiple results for {query}. Please be more specific.")
+#             except wikipedia.exceptions.PageError:
+#                 speak(f"Sorry, I could not find any result for {query}.")
 
-        # Open YouTube
-        elif 'open youtube' in query:
-            speak("Opening YouTube...")
-            webbrowser.open('https://www.youtube.com')
+#         # Open YouTube
+#         elif 'open youtube' in query:
+#             speak("Opening YouTube...")
+#             webbrowser.open('https://www.youtube.com')
 
-        # Check time
-        elif 'time kya hai' in query or 'what time is it' in query:
-            strTime = datetime.datetime.now().strftime("%H:%M:%S")
-            speak(f"Sir, the time is {strTime}")
+#         # Check time
+#         elif 'time kya hai' in query or 'what time is it' in query:
+#             strTime = datetime.datetime.now().strftime("%H:%M:%S")
+#             speak(f"Sir, the time is {strTime}")
 
-        # Open Visual Studio Code
-        elif 'open code' in query:
-            codePath = "C:\\Users\\hp\\Microsoft VS Code\\Code.exe"
-            if os.path.exists(codePath):
-                speak("Opening Visual Studio Code...")
-                os.startfile(codePath)
-            else:
-                speak("Sorry, I could not find Visual Studio Code on your system.")
+#         # Open Visual Studio Code
+#         elif 'open code' in query:
+#             codePath = "C:\\Users\\hp\\Microsoft VS Code\\Code.exe"
+#             if os.path.exists(codePath):
+#                 speak("Opening Visual Studio Code...")
+#                 os.startfile(codePath)
+#             else:
+#                 speak("Sorry, I could not find Visual Studio Code on your system.")
 
-        # Open WhatsApp
-        elif 'open whatsapp' in query:
-            speak("Opening WhatsApp...")
-            webbrowser.open('https://web.whatsapp.com/')
+#         # Open WhatsApp
+#         elif 'open whatsapp' in query:
+#             speak("Opening WhatsApp...")
+#             webbrowser.open('https://web.whatsapp.com/')
 
-        # Open Chrome
-        elif 'open chrome' in query:
-            chromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-            if os.path.exists(chromePath):
-                speak("Opening Google Chrome...")
-                os.startfile(chromePath)
-            else:
-                speak("Sorry, I could not find Google Chrome on your system.")
+#         # Open Chrome
+#         elif 'open chrome' in query:
+#             chromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+#             if os.path.exists(chromePath):
+#                 speak("Opening Google Chrome...")
+#                 os.startfile(chromePath)
+#             else:
+#                 speak("Sorry, I could not find Google Chrome on your system.")
 
-        # Exit the assistant
-        elif 'exit' in query or 'quit' in query:
-            speak("Goodbye Sir!")
-            break
+#         # Exit the assistant
+#         elif 'exit' in query or 'quit' in query:
+#             speak("Goodbye Sir!")
+#             break
